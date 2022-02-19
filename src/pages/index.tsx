@@ -6,6 +6,9 @@ import Table from "../components/Table";
 import Client from "../core/Client";
 
 export default function Home() {
+  const [client, setClient] = useState<Client>(Client.empty());
+  const [visible, setVisible] = useState<"table" | "form">("table");
+
   const clients = [
     new Client("Alan", 29, "1"),
     new Client("Laise", 27, "2"),
@@ -14,18 +17,23 @@ export default function Home() {
   ];
 
   function clientSelected(client: Client) {
-    console.log(client.name);
+    setClient(client);
+    setVisible("form");
   }
 
   function clientDeleted(client: Client) {
     console.log(client.name);
   }
 
-  function saveClient(client: Client) {
-    console.log(client);
+  function newClient() {
+    setClient(Client.empty());
+    setVisible("form");
   }
 
-  const [visible, setVisible] = useState<"table" | "form">("table");
+  function saveClient(client: Client) {
+    console.log(client);
+    setVisible("table");
+  }
 
   return (
     <div
@@ -39,11 +47,7 @@ export default function Home() {
         {visible === "table" ? (
           <Fragment>
             <div className="flex justify-end">
-              <Button
-                className="mb-4"
-                color="green"
-                onClick={() => setVisible("form")}
-              >
+              <Button className="mb-4" color="green" onClick={newClient}>
                 New Client
               </Button>
             </div>
@@ -55,7 +59,7 @@ export default function Home() {
           </Fragment>
         ) : (
           <Form
-            client={clients[1]}
+            client={client}
             cancelled={() => setVisible("table")}
             onSubmit={saveClient}
           />
