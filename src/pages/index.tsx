@@ -1,4 +1,6 @@
+import { Fragment, useState } from "react";
 import Button from "../components/Button";
+import Form from "../components/Form";
 import Layout from "../components/Layout";
 import Table from "../components/Table";
 import Client from "../core/Client";
@@ -19,6 +21,12 @@ export default function Home() {
     console.log(client.name);
   }
 
+  function saveClient(client: Client) {
+    console.log(client);
+  }
+
+  const [visible, setVisible] = useState<"table" | "form">("table");
+
   return (
     <div
       className={`
@@ -28,16 +36,30 @@ export default function Home() {
     `}
     >
       <Layout title="Registration">
-        <div className="flex justify-end">
-          <Button className="mb-4" color="green">
-            New Client
-          </Button>
-        </div>
-        <Table
-          clients={clients}
-          clientSelected={clientSelected}
-          clientDeleted={clientDeleted}
-        ></Table>
+        {visible === "table" ? (
+          <Fragment>
+            <div className="flex justify-end">
+              <Button
+                className="mb-4"
+                color="green"
+                onClick={() => setVisible("form")}
+              >
+                New Client
+              </Button>
+            </div>
+            <Table
+              clients={clients}
+              clientSelected={clientSelected}
+              clientDeleted={clientDeleted}
+            ></Table>
+          </Fragment>
+        ) : (
+          <Form
+            client={clients[1]}
+            cancelled={() => setVisible("table")}
+            onSubmit={saveClient}
+          />
+        )}
       </Layout>
     </div>
   );
