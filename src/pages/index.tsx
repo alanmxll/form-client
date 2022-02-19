@@ -1,3 +1,4 @@
+import Button from "../components/Button";
 import Layout from "../components/Layout";
 import Table from "../components/Table";
 import Client from "../core/Client";
@@ -27,6 +28,11 @@ export default function Home() {
     `}
     >
       <Layout title="Registration">
+        <div className="flex justify-end">
+          <Button className="mb-4" color="green">
+            New Client
+          </Button>
+        </div>
         <Table
           clients={clients}
           clientSelected={clientSelected}
