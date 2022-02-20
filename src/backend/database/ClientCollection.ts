@@ -1,3 +1,4 @@
+import { initializeApp } from "firebase/app";
 import {
   addDoc,
   collection,
@@ -14,6 +15,14 @@ import Client from "../../core/Client";
 import ClientRepository from "../../core/ClientRepository";
 
 export default class ClientCollection implements ClientRepository {
+  constructor() {
+    initializeApp({
+      apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+      authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+    });
+  }
+
   conversor = {
     toFirestore(client: Client) {
       return {
@@ -35,7 +44,7 @@ export default class ClientCollection implements ClientRepository {
     const querySnapshot = await getDocs(q);
 
     const clients = querySnapshot.docs.map((doc) => {
-      return new Client(doc.data().name, doc.data().age, doc.data().id);
+      return new Client(doc.data().name, doc.data().age, doc.id);
     });
 
     return clients;
