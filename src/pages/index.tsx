@@ -1,47 +1,21 @@
-import { Fragment, useEffect, useState } from "react";
-import ClientCollection from "../backend/database/ClientCollection";
+import { Fragment } from "react";
 import Button from "../components/Button";
 import Form from "../components/Form";
 import Layout from "../components/Layout";
 import Table from "../components/Table";
-import Client from "../core/Client";
-import ClientRepository from "../core/ClientRepository";
+import useClients from "../hooks/useClients";
 
 export default function Home() {
-  const repository: ClientRepository = new ClientCollection();
-
-  const [client, setClient] = useState<Client>(Client.empty());
-  const [clients, setClients] = useState<Client[]>([]);
-  const [visible, setVisible] = useState<"table" | "form">("table");
-
-  useEffect(getAll, []);
-
-  function getAll() {
-    repository.getAll().then((clients) => {
-      setClients(clients);
-      setVisible("table");
-    });
-  }
-
-  function clientSelected(client: Client) {
-    setClient(client);
-    setVisible("form");
-  }
-
-  async function clientDeleted(client: Client) {
-    await repository.delete(client);
-    getAll();
-  }
-
-  function newClient() {
-    setClient(Client.empty());
-    setVisible("form");
-  }
-
-  async function saveClient(client: Client) {
-    await repository.save(client);
-    getAll();
-  }
+  const {
+    client,
+    clients,
+    deleteClient,
+    newClient,
+    saveClient,
+    selectClient,
+    tableVisible,
+    showTable,
+  } = useClients();
 
   return (
     <div
@@ -52,7 +26,7 @@ export default function Home() {
     `}
     >
       <Layout title="Registration">
-        {visible === "table" ? (
+        {tableVisible ? (
           <Fragment>
             <div className="flex justify-end">
               <Button className="mb-4" color="green" onClick={newClient}>
@@ -61,16 +35,12 @@ export default function Home() {
             </div>
             <Table
               clients={clients}
-              clientSelected={clientSelected}
-              clientDeleted={clientDeleted}
+              clientSelected={selectClient}
+              clientDeleted={deleteClient}
             ></Table>
           </Fragment>
         ) : (
-          <Form
-            client={client}
-            cancelled={() => setVisible("table")}
-            onSubmit={saveClient}
-          />
+          <Form client={client} cancelled={showTable} onSubmit={saveClient} />
         )}
       </Layout>
     </div>
