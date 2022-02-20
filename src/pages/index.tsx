@@ -1,28 +1,36 @@
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
+import ClientCollection from "../backend/database/ClientCollection";
 import Button from "../components/Button";
 import Form from "../components/Form";
 import Layout from "../components/Layout";
 import Table from "../components/Table";
 import Client from "../core/Client";
+import ClientRepository from "../core/ClientRepository";
 
 export default function Home() {
+  const repository: ClientRepository = new ClientCollection();
+
   const [client, setClient] = useState<Client>(Client.empty());
+  const [clients, setClients] = useState<Client[]>([]);
   const [visible, setVisible] = useState<"table" | "form">("table");
 
-  const clients = [
-    new Client("Alan", 29, "1"),
-    new Client("Laise", 27, "2"),
-    new Client("Max", 9, "3"),
-    new Client("Juice", 5, "4"),
-  ];
+  useEffect(getAll, []);
+
+  function getAll() {
+    repository.getAll().then((clients) => {
+      setClients(clients);
+      setVisible("table");
+    });
+  }
 
   function clientSelected(client: Client) {
     setClient(client);
     setVisible("form");
   }
 
-  function clientDeleted(client: Client) {
-    console.log(client.name);
+  async function clientDeleted(client: Client) {
+    await repository.delete(client);
+    getAll();
   }
 
   function newClient() {
@@ -30,9 +38,9 @@ export default function Home() {
     setVisible("form");
   }
 
-  function saveClient(client: Client) {
-    console.log(client);
-    setVisible("table");
+  async function saveClient(client: Client) {
+    await repository.save(client);
+    getAll();
   }
 
   return (
